@@ -3,8 +3,9 @@ apt-get update
 apt install docker.io -y
 apt install python3-pip -y
 apt install zip unzip
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 bash <(wget -qO- https://git.io/JJYE0)
+sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod a+x /usr/local/bin/docker-compose
 cat > docker-compose.yml <<EOF
 version: "2.1"
 services:
