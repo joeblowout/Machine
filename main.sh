@@ -10,7 +10,7 @@ cat > docker-compose.yml <<EOF
 version: "2.1"
 services:
   qbittorrent:
-    image: linuxserver/qbittorrent:14.3.5.99202106211645-7376-e25948e73ubuntu20.04.1-ls140
+    image: linuxserver/qbittorrent:14.3.6.99202107121017-7389-3ac8c97e6ubuntu20.04.1-ls148
     container_name: qb
     environment:
       - PUID=1000
