@@ -1,0 +1,2 @@
+docker pull linuxserver/librespeed
+docker run -e MODE=standalone -p 55:80 -idt --name spd --restart unless-stopped linuxserver/librespeed
