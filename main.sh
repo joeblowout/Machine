@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 apt-get update
-apt install docker.io -y
+curl -fsSL https://get.docker.com | bash -s docker
 apt install python3-pip -y
 apt install zip unzip
 bash <(wget -qO- https://git.io/JJYE0)
