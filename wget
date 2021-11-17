@@ -1,0 +1,1 @@
+wget --header 'Authorization: token PERSONAL_ACCESS_TOKEN_HERE' https://raw.githubusercontent.com/repoOwner/repoName/master/folder/filename
