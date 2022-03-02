@@ -1,0 +1,243 @@
+apt update && apt install curl sudo wget -y
+curl -sSL https://get.docker.com/ | sh
+sudo apt-get install docker-compose -y
+
+# autobot
+version: "2.0"
+services:
+  bot:
+    image: python:3.8
+    container_name: bot
+    restart: always
+    tty: true
+    network_mode: bridge
+    hostname: bot
+    volumes:
+      - /home/saint:/home
+
+# qb
+version: "2.1"
+services:
+  qb:
+    image: linuxserver/qbittorrent
+    container_name: qb
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - WEBUI_PORT=8080
+    volumes:
+      - /home/qb/config:/config
+      - /home/qb/downloads:/downloads
+      - /home/qb/config/rclone:/root/.config/rclone
+    ports:
+      - 55555:55555
+      - 6881:6881/udp
+      - 8080:8080
+    network_mode: bridge
+    restart: unless-stopped
+    
+# Aria2系列
+version: "3.3"
+services:
+  aria2:
+    image: p3terx/aria2-pro
+    container_name: aria2
+    environment:
+      - PUID=0
+      - PGID=0
+      - UMASK_SET=022
+      - RPC_SECRET=<key>
+      - RPC_PORT=6800
+      - LISTEN_PORT=6888
+      - DISK_CACHE=64M
+      - IPV6_MODE=false
+      - UPDATE_TRACKERS=true
+      - CUSTOM_TRACKER_URL=
+      - TZ=Asia/Shanghai
+      - SPECIAL_MODE=rclone
+    volumes:
+      - /home/aria2/config:/config
+      - /home/aria2/downloads:/downloads
+    ports:
+      - 6800:6800
+      - 6888:6888
+    network_mode: host
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+
+  AriaNg:
+    image: p3terx/ariang
+    container_name: ariang
+    command: --port 6880 --ipv6
+    network_mode: host
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+
+  Aria2Bot:
+    image: p3terx/tele-aria2:0.2.2
+    container_name: aria2bot
+    volumes:
+      - /home/aria2/.tele-aria2-conf.json:/config.json
+    network_mode: host
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: 1m
+
+# emby
+version: "2.3"
+services:
+  emby:
+    image: linuxserver/emby:beta-version-4.7.0.20
+    container_name: emby
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - UMASK_SET=022 #optional
+    volumes:
+      - ./source:/config
+      - /home/emby:/home
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+
+# plex
+version: "2.1"
+services:
+  plex:
+    image: lscr.io/linuxserver/plex
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Shanghai
+      - VERSION=docker
+      - PLEX_CLAIM=claim-
+    volumes:
+      - ./plex:/config
+      - /home/plex:/home
+    restart: unless-stopped
+
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    #环境变量,设置为上海时区
+    environment:
+        - TZ=Asia/Shanghai
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: plex --cleanup --schedule "0 5 * * * *" 
+
+# npm
+version: '3'
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    environment:
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "npm"
+      DB_MYSQL_PASSWORD: "npm"
+      DB_MYSQL_NAME: "npm"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+  db:
+    image: 'jc21/mariadb-aria:latest'
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: 'npm'
+      MYSQL_DATABASE: 'npm'
+      MYSQL_USER: 'npm'
+      MYSQL_PASSWORD: 'npm'
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+
+#reader3
+version: '3.1'
+# 多用户版
+services:
+  read_all:
+    image: hectorqin/reader
+    container_name: reader #容器名 可自行修改
+    restart: always
+    ports:
+      - 8080:8080 #4396端口映射可自行修改
+    volumes:
+      - /home/reader3/log:/log #log映射目录 /home/reader/log 可自行修改
+      - /home/reader3/storage:/storage #数据映射目录 /home/reader/storage 可自行修改
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - READER_APP_SECURE=true
+      - READER_APP_SECUREKEY=  #管理员密码  可自行修改
+      - READER_APP_INVITECODE= #注册邀请码,如需要取消注释 可自行修改
+    command: java -jar /app/bin/reader.jar
+# 自动更新docker
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: always
+    #环境变量,设置为上海时区
+    environment:
+        - TZ=Asia/Shanghai
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: reader --cleanup --schedule "0 0 4 * * *" 
+
+# flexget
+version: '2'
+services:
+    flexget:
+      image:  ghcr.io/apocalypsor/flexget
+      container_name: flexget
+      hostname: flexget
+      environment:
+        FG_WEBUI_PASSWD:  # 替换为你自己的密码，登录 Web 用
+        FG_LOG_LEVEL: INFO 
+        TZ: Asia/Shanghai
+        PUID: 1000
+        PGID: 1000
+      volumes:
+        - ./config:/config
+        - /config/plugins
+        - ./downloads:/downloads
+      ports:
+        - 3539:3539
+
+
+
+      restart: always
+      logging:
+        driver: "json-file"
+        options:
+          max-size: "200k"
+
+
+# librespeed
+docker run -d \
+  --name=librespeed \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e TZ=Asia/Shanghai \
+  -e PASSWORD=password \
+  -p 7788:80 \
+  -v /root/ls/config:/config \
+  --restart always \
+  ghcr.io/linuxserver/librespeed
+  
