@@ -37,11 +37,10 @@ services:
     environment:
       - PUID=1000
       - PGID=1000
-      - TZ=Asia/Shanghai
+      - TZ=Asia/Singapore
       - UMASK_SET=022 #optional
     volumes:
-      - ./source:/config
-      - /home/emby:/home
-    ports:
-      - 8096:8096
+      - ./emby:/config
+      - /mnt:/mnt
+    network_mode: host
     restart: unless-stopped
