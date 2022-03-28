@@ -44,3 +44,21 @@ services:
       - /mnt:/mnt
     network_mode: host
     restart: unless-stopped
+
+#SPEEDTEST
+version: '3.3'
+services:
+    linuxserver:
+        image: ghcr.io/linuxserver/librespeed
+        container_name: spd
+        hostname: spd
+        environment:
+            - PUID=1000
+            - PGID=1000
+            - TZ=Asia/Singapore
+            - PASSWORD=password
+        ports:
+            - '55:80'
+        volumes:
+            - './config:/config'
+        restart: always
