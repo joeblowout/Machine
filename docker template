@@ -1,5 +1,50 @@
 #create a docker image from container
 #skip installing dependencies each time a container is recreated
-docker commit BASECONTAINERID NEWIMAGEID
+1) docker run a container from desired image as base conntainer
+2) head into the container, install required dependencies, then exit
+3) docker commit BASECONTAINERID NEWIMAGEID #to create new image from base container
+4) docker run newcontainer NEWIMAGEID, done
 
-docker run NEWIMAGEID
+#sample emby
+version: "2.3"
+services:
+  emby:
+    image: linuxserver/emby:beta-version-4.7.0.20
+    container_name: emby
+    hostname: emby
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Singapore
+      - UMASK_SET=022 #optional
+    volumes:
+      - ./config:/config
+      - /mnt:/mnt
+    network_mode: host
+    restart: unless-stopped
+  external:
+    image: external_url
+    container_name: external
+    hostname: mod
+    restart: unless-stopped
+    volumes:
+     - ./external:/root/external
+     - ./external.sh:/root/external.sh
+    network_mode: host
+    entrypoint: /root/external.sh
+
+#external.sh
+#!/bin/bash
+node /root/external/index.js --watch
+
+#base container
+version: "3.4"
+services:
+    sandbox:
+      image: python
+      container_name: sandbox
+      restart: unless-stopped
+      tty: true
+      network_mode: bridge
+
+docker commit sandboxid external_url
