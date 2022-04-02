@@ -5,6 +5,19 @@
 3) docker commit BASECONTAINERID NEWIMAGEID #to create new image from base container
 4) docker run newcontainer NEWIMAGEID, done
 
+
+#base container
+version: "3.4"
+services:
+    sandbox:
+      image: python
+      container_name: sandbox
+      restart: unless-stopped
+      tty: true
+      network_mode: bridge
+
+docker commit sandboxid external_url
+
 #sample emby
 version: "2.3"
 services:
@@ -36,15 +49,3 @@ services:
 #external.sh
 #!/bin/bash
 node /root/external/index.js --watch
-
-#base container
-version: "3.4"
-services:
-    sandbox:
-      image: python
-      container_name: sandbox
-      restart: unless-stopped
-      tty: true
-      network_mode: bridge
-
-docker commit sandboxid external_url
