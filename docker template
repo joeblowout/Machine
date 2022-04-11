@@ -2,8 +2,8 @@
 #skip installing dependencies each time a container is recreated
 1) docker run a container from desired image as base conntainer
 2) head into the container, install required dependencies (apt install abc, python modules anything..), then exit
-3) docker commit BASECONTAINERID NEWIMAGEID #to create new image from base container
-4) docker run newcontainer NEWIMAGEID, done
+3) docker commit BASECONTAINERID NEWIMAGENAME #to create new image from base container
+4) docker run newcontainer NEWIMAGENAME, done
 
 
 #base container
