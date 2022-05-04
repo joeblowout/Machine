@@ -4,8 +4,8 @@ curl -fsSL https://get.docker.com | bash -s docker
 apt install python3-pip -y
 apt install zip unzip
 bash <(wget -qO- https://git.io/JJYE0)
-sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-chmod 777 /usr/local/bin/docker-compose
+sudo curl -L "https://github.com/docker/compose/releases/download/2.5.0/docker-compose-linux-aarch64" -o /usr/local/bin/compose
+chmod +x /usr/local/bin/compose
 cat > docker-compose.yml <<EOF
 version: "2.1"
 services:
