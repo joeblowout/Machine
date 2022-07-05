@@ -16,7 +16,7 @@ services:
       - TZ=Asia/Singapore
       - DOCKER_USER=coder
     volumes:
-      - ./data:/root
+      - ./data:/home/coder
     logging:
       driver: "json-file"
       options:
