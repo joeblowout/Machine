@@ -1,0 +1,30 @@
+version: "3"
+services:
+  surgio:
+#    image: surgio:latest
+    build: .
+    container_name: surgio
+    hostname: surgio
+    restart: always
+    expose:
+      - 8080
+    ports:
+      - 58:8080
+      - 85:3000
+    user: 0:0
+    environment:
+      - TZ=Asia/Singapore
+      - DOCKER_USER=coder
+    volumes:
+      - ./data:/root
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        
+FROM codercom/code-server:latest
+
+USER root
+
+RUN  curl -sL https://deb.nodesource.com/setup_14.x | bash - && \
+     apt -y install nodejs
